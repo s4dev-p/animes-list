@@ -3,157 +3,1195 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Watchlist Exclusiva de Animes</title>
+  <title>AnimeVault - Sua Playlist Exclusiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --dark-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+      
+      --bg-light: #f8fafc;
+      --bg-dark: #0f172a;
+      --card-light: #ffffff;
+      --card-dark: #1e293b;
+      --text-light: #1e293b;
+      --text-dark: #f1f5f9;
+      --border-light: #e2e8f0;
+      --border-dark: #334155;
+      --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.3);
+      
+      --border-radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      box-sizing: border-box;
     }
-    h1 {
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      line-height: 1.6;
+      transition: var(--transition);
+      min-height: 100vh;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header */
+    .header {
+      background: var(--primary-gradient);
+      padding: 2rem 0;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 2;
       text-align: center;
-      margin-bottom: 30px;
     }
+
+    .main-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #fff, #f0f9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    /* Controls Section */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--card-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+      backdrop-filter: blur(10px);
+      transition: var(--transition);
+    }
+
+    body.dark-mode .controls {
+      background: var(--card-dark);
+      box-shadow: var(--shadow-dark);
+    }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      min-width: 300px;
+      max-width: 500px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 20px 12px 50px;
+      border: 2px solid var(--border-light);
+      border-radius: 50px;
+      font-size: 1rem;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    body.dark-mode .search-input {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 15px;
+      border: 2px solid var(--border-light);
+      border-radius: 10px;
+      background: var(--bg-light);
+      color: var(--text-light);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    body.dark-mode .filter-select {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    .theme-toggle {
+      padding: 10px;
+      border: none;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    }
+
+    .view-toggle {
+      display: flex;
+      background: var(--bg-light);
+      border-radius: 10px;
+      padding: 4px;
+      border: 2px solid var(--border-light);
+    }
+
+    body.dark-mode .view-toggle {
+      background: var(--bg-dark);
+      border-color: var(--border-dark);
+    }
+
+    .view-btn {
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-light);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: var(--transition);
+      font-size: 1rem;
+    }
+
+    .view-btn.active {
+      background: var(--primary-gradient);
+      color: white;
+    }
+
+    body.dark-mode .view-btn {
+      color: var(--text-dark);
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-light);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
+      text-align: center;
+      transition: var(--transition);
+      border: 1px solid var(--border-light);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    body.dark-mode .stat-card {
+      background: var(--card-dark);
+      box-shadow: var(--shadow-dark);
+      border-color: var(--border-dark);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* Anime Grid */
     .anime-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
     }
+
+    .anime-grid.list-view {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
     .anime-card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: var(--card-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-light);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
     }
+
+    .anime-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-mode .anime-card {
+      background: var(--card-dark);
+      box-shadow: var(--shadow-dark);
+      border-color: var(--border-dark);
+    }
+
+    .anime-card.list-view {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .anime-card.list-view .image-container {
+      flex-shrink: 0;
+      width: 120px;
+      height: 160px;
+    }
+
+    .image-container {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(45deg, #f0f9ff, #e0f2fe);
+    }
+
     .anime-card img {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 300px;
+      object-fit: cover;
+      transition: var(--transition);
     }
+
+    .anime-card.list-view img {
+      height: 160px;
+    }
+
+    .anime-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .rating-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      backdrop-filter: blur(10px);
+    }
+
+    .star {
+      color: #fbbf24;
+      font-size: 0.8rem;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-completed {
+      background: linear-gradient(45deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .status-watching {
+      background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+      color: white;
+    }
+
+    .status-planned {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+      color: white;
+    }
+
     .anime-content {
-      padding: 15px;
+      padding: 1.5rem;
       flex-grow: 1;
     }
-    .anime-content h2 {
-      font-size: 1.2em;
-      margin: 0 0 10px;
+
+    .anime-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-light);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
+
+    body.dark-mode .anime-title {
+      color: var(--text-dark);
+    }
+
     .genres {
-      font-size: 0.9em;
-      color: #555;
-      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
-    .watch-link {
+
+    .genre-tag {
+      background: var(--accent-gradient);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .anime-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    .episodes {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .year {
+      font-weight: 500;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
       text-decoration: none;
-      background: #007BFF;
-      color: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      text-align: center;
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
     }
-    .watch-link:hover {
-      background: #0056b3;
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-light);
+      color: var(--text-light);
+      border: 2px solid var(--border-light);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-light);
+    }
+
+    body.dark-mode .btn-secondary {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border-light);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-controls {
+        justify-content: center;
+      }
+
+      .anime-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .search-container {
+        min-width: auto;
+        max-width: none;
+      }
+
+      .anime-card.list-view {
+        flex-direction: column;
+      }
+
+      .anime-card.list-view .image-container {
+        width: 100%;
+        height: 200px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .anime-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: var(--transition);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
   </style>
 </head>
 <body>
-  <h1>Watchlist Exclusiva (Romance)</h1>
-  <div class="anime-grid">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="main-title">
+          <i class="fas fa-play-circle"></i>
+          AnimeVault
+        </h1>
+        <p class="subtitle">Sua coleção exclusiva de animes românticos</p>
+      </div>
+    </div>
+  </header>
 
-    <div class="anime-card">
-      <img src="OreMonogatari.jpeg" alt="Capa de Ore Monogatari!!"/>
-      <div class="anime-content">
-        <h2>Ore Monogatari!!</h2>
-        <p class="genres">Romance, Comédia</p>
-        <a href="#" class="watch-link">Assistir</a>
+  <div class="container">
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Buscar animes..." id="searchInput">
+      </div>
+      
+      <div class="filter-controls">
+        <select class="filter-select" id="genreFilter">
+          <option value="">Todos os gêneros</option>
+          <option value="romance">Romance</option>
+          <option value="comédia">Comédia</option>
+          <option value="drama">Drama</option>
+          <option value="slice-of-life">Slice-of-Life</option>
+          <option value="shōjo">Shōjo</option>
+          <option value="ecchi">Ecchi</option>
+          <option value="escolar">Escolar</option>
+          <option value="psicológico">Psicológico</option>
+        </select>
+
+        <select class="filter-select" id="statusFilter">
+          <option value="">Todos os status</option>
+          <option value="completed">Completo</option>
+          <option value="watching">Assistindo</option>
+          <option value="planned">Planejado</option>
+        </select>
+
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridView">
+            <i class="fas fa-th"></i>
+          </button>
+          <button class="view-btn" id="listView">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+
+        <button class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
       </div>
     </div>
 
-    <div class="anime-card">
-      <img src="horimiya.jpeg" alt="Capa de Horimiya"/>
-      <div class="anime-content">
-        <h2>Horimiya</h2>
-        <p class="genres">Slice-of-Life, Romance</p>
-        <a href="#" class="watch-link">Assistir</a>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="totalAnimes">10</div>
+        <div class="stat-label">Total de Animes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="completedAnimes">7</div>
+        <div class="stat-label">Completos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="watchingAnimes">2</div>
+        <div class="stat-label">Assistindo</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="plannedAnimes">1</div>
+        <div class="stat-label">Planejados</div>
       </div>
     </div>
 
-    <div class="anime-card">
-      <img src="tonikawa.jpeg" alt="Capa de Tonikaku Kawaii"/>
-      <div class="anime-content">
-        <h2>Tonikaku Kawaii</h2>
-        <p class="genres">Romance, Comédia</p>
-        <a href="#" class="watch-link">Assistir</a>
+    <!-- Anime Grid -->
+    <div class="anime-grid" id="animeGrid">
+      <div class="anime-card fade-in" data-genres="romance,comédia" data-status="completed">
+        <div class="image-container">
+          <img src="OreMonogatari.jpeg" alt="Capa de Ore Monogatari!!"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            8.9
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Ore Monogatari!!</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              24 eps
+            </div>
+            <div class="year">2015</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Romance</span>
+            <span class="genre-tag">Comédia</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="slice-of-life,romance" data-status="completed">
+        <div class="image-container">
+          <img src="horimiya.jpeg" alt="Capa de Horimiya"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            9.2
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Horimiya</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              13 eps
+            </div>
+            <div class="year">2021</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Slice-of-Life</span>
+            <span class="genre-tag">Romance</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="romance,comédia" data-status="watching">
+        <div class="image-container">
+          <img src="tonikawa.jpeg" alt="Capa de Tonikaku Kawaii"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            8.7
+          </div>
+          <div class="status-badge status-watching">Assistindo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Tonikaku Kawaii</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              12 eps
+            </div>
+            <div class="year">2020</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Romance</span>
+            <span class="genre-tag">Comédia</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Continuar
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="shōjo,comédia" data-status="completed">
+        <div class="image-container">
+          <img src="maid-sama.jpeg" alt="Capa de Kaichou wa Maid-sama!"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            8.5
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Kaichou wa Maid-sama!</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              26 eps
+            </div>
+            <div class="year">2010</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Shōjo</span>
+            <span class="genre-tag">Comédia</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="drama,romance" data-status="completed">
+        <div class="image-container">
+          <img src="TsukigaKirei.jpeg" alt="Capa de Tsuki ga Kirei"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            9.0
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Tsuki ga Kirei</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              12 eps
+            </div>
+            <div class="year">2017</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Drama</span>
+            <span class="genre-tag">Romance</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="comédia,romance,escolar,psicológico" data-status="completed">
+        <div class="image-container">
+          <img src="Kaguya-samaLoveisWar.jpeg" alt="Capa de Kaguya-sama: Love is War"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            9.4
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Kaguya-sama: Love is War</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              36 eps
+            </div>
+            <div class="year">2019</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Comédia</span>
+            <span class="genre-tag">Romance</span>
+            <span class="genre-tag">Escolar</span>
+            <span class="genre-tag">Psicológico</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="shōjo,comédia" data-status="completed">
+        <div class="image-container">
+          <img src="OkamiShojotoKuroOji.jpeg" alt="Capa de Ōkami Shōjo to Kuro Ōji"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            7.8
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Ōkami Shōjo to Kuro Ōji</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              12 eps
+            </div>
+            <div class="year">2014</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Shōjo</span>
+            <span class="genre-tag">Comédia</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="ecchi,drama" data-status="watching">
+        <div class="image-container">
+          <img src="NanatoKaoru.jpeg" alt="Capa de Nana to Kaoru"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            7.5
+          </div>
+          <div class="status-badge status-watching">Assistindo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Nana to Kaoru</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              2 eps
+            </div>
+            <div class="year">2011</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Ecchi</span>
+            <span class="genre-tag">Drama</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Continuar
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="ecchi,drama" data-status="completed">
+        <div class="image-container">
+          <img src="NozokiAna.jpeg" alt="Capa de Nozoki Ana"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            7.2
+          </div>
+          <div class="status-badge status-completed">Completo</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Nozoki Ana</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              1 ep
+            </div>
+            <div class="year">2013</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Ecchi</span>
+            <span class="genre-tag">Drama</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-play"></i>
+              Assistir
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="anime-card fade-in" data-genres="drama,romance" data-status="planned">
+        <div class="image-container">
+          <img src="ItsudatteBokuranoKoiwa10-Centimeter.jpeg" alt="Capa de Itsudatte Bokura no Koi wa 10-Centimeter"/>
+          <div class="rating-badge">
+            <i class="fas fa-star star"></i>
+            8.1
+          </div>
+          <div class="status-badge status-planned">Planejado</div>
+        </div>
+        <div class="anime-content">
+          <h2 class="anime-title">Itsudatte Bokura no Koi wa 10-Centimeter</h2>
+          <div class="anime-meta">
+            <div class="episodes">
+              <i class="fas fa-film"></i>
+              6 eps
+            </div>
+            <div class="year">2017</div>
+          </div>
+          <div class="genres">
+            <span class="genre-tag">Drama</span>
+            <span class="genre-tag">Romance</span>
+          </div>
+          <div class="action-buttons">
+            <a href="#" class="btn btn-primary">
+              <i class="fas fa-plus"></i>
+              Adicionar à Lista
+            </a>
+            <button class="btn btn-secondary">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="anime-card">
-      <img src="maid-sama.jpeg" alt="Capa de Kaichou wa Maid-sama!"/>
-      <div class="anime-content">
-        <h2>Kaichou wa Maid-sama!</h2>
-        <p class="genres">Shōjo, Comédia</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="TsukigaKirei.jpeg" alt="Capa de Tsuki ga Kirei"/>
-      <div class="anime-content">
-        <h2>Tsuki ga Kirei</h2>
-        <p class="genres">Drama, Romance</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="Kaguya-samaLoveisWar.jpeg" alt="Capa de Kaguya-sama: Love is War"/>
-      <div class="anime-content">
-        <h2>Kaguya-sama: Love is War</h2>
-        <p class="genres">Comédia, Romance, Escolar, Psicológico</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="OkamiShojotoKuroOji.jpeg" alt="Capa de Ōkami Shōjo to Kuro Ōji"/>
-      <div class="anime-content">
-        <h2>Ōkami Shōjo to Kuro Ōji</h2>
-        <p class="genres">Shōjo, Comédia</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="NanatoKaoru.jpeg" alt="Capa de Nana to Kaoru"/>
-      <div class="anime-content">
-        <h2>Nana to Kaoru</h2>
-        <p class="genres">Ecchi, Drama</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="NozokiAna.jpeg" alt="Capa de Nozoki Ana"/>
-      <div class="anime-content">
-        <h2>Nozoki Ana</h2>
-        <p class="genres">Ecchi, Drama</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
-    <div class="anime-card">
-      <img src="ItsudatteBokuranoKoiwa10-Centimeter.jpeg"/>
-      <div class="anime-content">
-        <h2>Itsudatte Bokura no Koi wa 10-Centimeter</h2>
-        <p class="genres">Drama, Romance</p>
-        <a href="#" class="watch-link">Assistir</a>
-      </div>
-    </div>
-
   </div>
+
+  <!-- Scroll to top button -->
+  <button class="scroll-top" id="scrollTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script>
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const themeIcon = themeToggle.querySelector('i');
+
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+      body.classList.add('dark-mode');
+      themeIcon.className = 'fas fa-sun';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const isDark = body.classList.contains('dark-mode');
+      themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // View toggle
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const animeGrid = document.getElementById('animeGrid');
+
+    gridView.addEventListener('click', () => {
+      gridView.classList.add('active');
+      listView.classList.remove('active');
+      animeGrid.classList.remove('list-view');
+      document.querySelectorAll('.anime-card').forEach(card => {
+        card.classList.remove('list-view');
+      });
+    });
+
+    listView.addEventListener('click', () => {
+      listView.classList.add('active');
+      gridView.classList.remove('active');
+      animeGrid.classList.add('list-view');
+      document.querySelectorAll('.anime-card').forEach(card => {
+        card.classList.add('list-view');
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const genreFilter = document.getElementById('genreFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    function filterAnimes() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedGenre = genreFilter.value.toLowerCase();
+      const selectedStatus = statusFilter.value.toLowerCase();
+      const animeCards = document.querySelectorAll('.anime-card');
+
+      animeCards.forEach(card => {
+        const title = card.querySelector('.anime-title').textContent.toLowerCase();
+        const genres = card.dataset.genres.toLowerCase();
+        const status = card.dataset.status.toLowerCase();
+
+        const matchesSearch = title.includes(searchTerm);
+        const matchesGenre = !selectedGenre || genres.includes(selectedGenre);
+        const matchesStatus = !selectedStatus || status === selectedStatus;
+
+        if (matchesSearch && matchesGenre && matchesStatus) {
+          card.style.display = 'block';
+          card.classList.add('fade-in');
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      updateStats();
+    }
+
+    searchInput.addEventListener('input', filterAnimes);
+    genreFilter.addEventListener('change', filterAnimes);
+    statusFilter.addEventListener('change', filterAnimes);
+
+    // Update stats
+    function updateStats() {
+      const visibleCards = document.querySelectorAll('.anime-card:not([style*="display: none"])');
+      const completed = Array.from(visibleCards).filter(card => card.dataset.status === 'completed').length;
+      const watching = Array.from(visibleCards).filter(card => card.dataset.status === 'watching').length;
+      const planned = Array.from(visibleCards).filter(card => card.dataset.status === 'planned').length;
+
+      document.getElementById('totalAnimes').textContent = visibleCards.length;
+      document.getElementById('completedAnimes').textContent = completed;
+      document.getElementById('watchingAnimes').textContent = watching;
+      document.getElementById('plannedAnimes').textContent = planned;
+    }
+
+    // Scroll to top
+    const scrollTop = document.getElementById('scrollTop');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTop.classList.add('visible');
+      } else {
+        scrollTop.classList.remove('visible');
+      }
+    });
+
+    scrollTop.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Add hover effects and animations
+    document.querySelectorAll('.anime-card').forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+      
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-8px) scale(1.02)';
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0) scale(1)';
+      });
+    });
+
+    // Initialize stats
+    updateStats();
+
+    // Add loading effect simulation
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.anime-card').forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('fade-in');
+        }, index * 100);
+      });
+    });
+  </script>
 </body>
 </html>
