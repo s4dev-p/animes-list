@@ -118,6 +118,25 @@
       min-height: 100vh;
     }
     
+    /* Mobile Overlay */
+    .mobile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 35;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+    
+    .mobile-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
     /* Sidebar */
     .sidebar {
       width: 280px;
@@ -220,6 +239,7 @@
       border-radius: var(--radius-lg);
       transition: all var(--transition-fast);
       position: relative;
+      cursor: pointer;
     }
     
     .nav-link:hover {
@@ -403,6 +423,14 @@
       flex: 1;
       padding: var(--space-6);
       overflow-y: auto;
+    }
+    
+    .page {
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
     }
     
     .page-header {
@@ -1004,14 +1032,14 @@
     
     /* Responsive Design */
     @media (max-width: 1024px) {
-      .sidebar {
+      .sidebar:not(.open) {
         width: 80px;
       }
       
-      .sidebar .logo-text,
-      .sidebar .nav-text,
-      .sidebar .nav-badge,
-      .sidebar .nav-section-title {
+      .sidebar:not(.open) .logo-text,
+      .sidebar:not(.open) .nav-text,
+      .sidebar:not(.open) .nav-badge,
+      .sidebar:not(.open) .nav-section-title {
         opacity: 0;
         width: 0;
         overflow: hidden;
@@ -1019,19 +1047,25 @@
     }
     
     @media (max-width: 768px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      
       .sidebar {
         position: fixed;
         left: -280px;
         height: 100vh;
         z-index: 40;
+        width: 280px !important;
       }
       
       .sidebar.open {
         left: 0;
       }
       
-      .app-layout {
-        grid-template-columns: 1fr;
+      .sidebar.open ~ .mobile-overlay {
+        opacity: 1;
+        visibility: visible;
       }
       
       .topbar {
@@ -1166,6 +1200,9 @@
 </head>
 <body>
   <div class="app-layout">
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -1313,7 +1350,7 @@
       <!-- Content -->
       <div class="content">
         <!-- Dashboard Page -->
-        <div class="page" id="page-dashboard">
+        <div class="page active" id="page-dashboard">
           <div class="page-header">
             <h1 class="page-title">Dashboard</h1>
             <p class="page-subtitle">Visão geral da sua coleção de animes</p>
@@ -1380,7 +1417,7 @@
         </div>
         
         <!-- Library Page -->
-        <div class="page hidden" id="page-library">
+        <div class="page" id="page-library">
           <div class="page-header">
             <h1 class="page-title">Biblioteca</h1>
             <p class="page-subtitle">Sua coleção completa de animes</p>
@@ -1443,8 +1480,8 @@
           </div>
         </div>
         
-        <!-- Other pages would be here (watching, completed, planned, etc.) -->
-        <div class="page hidden" id="page-watching">
+        <!-- Other pages -->
+        <div class="page" id="page-watching">
           <div class="page-header">
             <h1 class="page-title">Assistindo</h1>
             <p class="page-subtitle">Animes que você está acompanhando atualmente</p>
@@ -1454,7 +1491,7 @@
           </div>
         </div>
         
-        <div class="page hidden" id="page-completed">
+        <div class="page" id="page-completed">
           <div class="page-header">
             <h1 class="page-title">Completos</h1>
             <p class="page-subtitle">Animes que você já terminou de assistir</p>
@@ -1464,7 +1501,7 @@
           </div>
         </div>
         
-        <div class="page hidden" id="page-planned">
+        <div class="page" id="page-planned">
           <div class="page-header">
             <h1 class="page-title">Planejados</h1>
             <p class="page-subtitle">Animes que você pretende assistir</p>
@@ -1474,7 +1511,7 @@
           </div>
         </div>
         
-        <div class="page hidden" id="page-settings">
+        <div class="page" id="page-settings">
           <div class="page-header">
             <h1 class="page-title">Configurações</h1>
             <p class="page-subtitle">Personalize sua experiência</p>
@@ -1781,6 +1818,11 @@
       autoBackup: true
     };
 
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const modalOverlay = document.getElementById('modalOverlay');
+
     // Load settings from localStorage
     function loadSettings() {
       const savedSettings = localStorage.getItem('animeVaultSettings');
@@ -1799,19 +1841,28 @@
     function applySettings() {
       if (settings.darkMode) {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+        const themeBtn = document.getElementById('themeToggle');
+        if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
-        document.getElementById('themeToggle').innerHTML = '<i class="fas fa-moon"></i>';
+        const themeBtn = document.getElementById('themeToggle');
+        if (themeBtn) themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
       }
 
       // Update toggle switches in settings
-      document.getElementById('darkModeToggle').classList.toggle('active', settings.darkMode);
-      document.getElementById('focusModeSettings').classList.toggle('active', settings.focusMode);
-      document.getElementById('animationsToggle').classList.toggle('active', settings.animations);
-      document.getElementById('autoSaveToggle').classList.toggle('active', settings.autoSave);
-      document.getElementById('notificationsSettings').classList.toggle('active', settings.notifications);
-      document.getElementById('autoBackupToggle').classList.toggle('active', settings.autoBackup);
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const focusModeSettings = document.getElementById('focusModeSettings');
+      const animationsToggle = document.getElementById('animationsToggle');
+      const autoSaveToggle = document.getElementById('autoSaveToggle');
+      const notificationsSettings = document.getElementById('notificationsSettings');
+      const autoBackupToggle = document.getElementById('autoBackupToggle');
+
+      if (darkModeToggle) darkModeToggle.classList.toggle('active', settings.darkMode);
+      if (focusModeSettings) focusModeSettings.classList.toggle('active', settings.focusMode);
+      if (animationsToggle) animationsToggle.classList.toggle('active', settings.animations);
+      if (autoSaveToggle) autoSaveToggle.classList.toggle('active', settings.autoSave);
+      if (notificationsSettings) notificationsSettings.classList.toggle('active', settings.notifications);
+      if (autoBackupToggle) autoBackupToggle.classList.toggle('active', settings.autoBackup);
 
       if (settings.focusMode) {
         document.body.classList.add('focus-mode');
@@ -1824,17 +1875,23 @@
     function showPage(pageId) {
       // Hide all pages
       document.querySelectorAll('.page').forEach(page => {
-        page.classList.add('hidden');
+        page.classList.remove('active');
       });
 
       // Show selected page
-      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+      const targetPage = document.getElementById(`page-${pageId}`);
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
 
       // Update nav links
       document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
       });
-      document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+      const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
 
       currentPage = pageId;
 
@@ -1850,11 +1907,46 @@
       } else if (pageId === 'dashboard') {
         updateStats();
       }
+
+      // Close mobile menu if open
+      closeMobileMenu();
+    }
+
+    // Mobile menu functions
+    function openMobileMenu() {
+      sidebar.classList.add('open');
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileMenu() {
+      sidebar.classList.remove('open');
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Modal functions
+    function openModal(title, content) {
+      const modalTitle = document.getElementById('modalTitle');
+      const modalContent = document.getElementById('modalContent');
+      
+      if (modalTitle) modalTitle.textContent = title;
+      if (modalContent) modalContent.innerHTML = content;
+      
+      modalOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     // Render anime cards
     function renderAnimes(animes, containerId = 'animeGrid') {
       const container = document.getElementById(containerId);
+      if (!container) return;
+      
       container.innerHTML = '';
 
       animes.forEach(anime => {
@@ -1935,34 +2027,47 @@
       const planned = animeData.filter(anime => anime.status === 'planned').length;
       const totalEpisodes = animeData.reduce((sum, anime) => sum + anime.progress, 0);
 
-      document.getElementById('totalAnimes').textContent = animeData.length;
-      document.getElementById('episodesWatched').textContent = totalEpisodes;
+      const totalAnimesEl = document.getElementById('totalAnimes');
+      const episodesWatchedEl = document.getElementById('episodesWatched');
+
+      if (totalAnimesEl) totalAnimesEl.textContent = animeData.length;
+      if (episodesWatchedEl) episodesWatchedEl.textContent = totalEpisodes;
 
       // Update navigation badges
-      document.querySelector('[data-page="library"] .nav-badge').textContent = animeData.length;
-      document.querySelector('[data-page="watching"] .nav-badge').textContent = watching;
-      document.querySelector('[data-page="completed"] .nav-badge').textContent = completed;
-      document.querySelector('[data-page="planned"] .nav-badge').textContent = planned;
+      const libraryBadge = document.querySelector('[data-page="library"] .nav-badge');
+      const watchingBadge = document.querySelector('[data-page="watching"] .nav-badge');
+      const completedBadge = document.querySelector('[data-page="completed"] .nav-badge');
+      const plannedBadge = document.querySelector('[data-page="planned"] .nav-badge');
+
+      if (libraryBadge) libraryBadge.textContent = animeData.length;
+      if (watchingBadge) watchingBadge.textContent = watching;
+      if (completedBadge) completedBadge.textContent = completed;
+      if (plannedBadge) plannedBadge.textContent = planned;
     }
 
     // Filter and search functions
     function filterAnimes() {
-      const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
-      const genreFilter = document.getElementById('genreFilter')?.value;
-      const statusFilter = document.getElementById('statusFilter')?.value;
-      const sortFilter = document.getElementById('sortFilter')?.value || 'title';
+      const globalSearch = document.getElementById('globalSearch');
+      const genreFilter = document.getElementById('genreFilter');
+      const statusFilter = document.getElementById('statusFilter');
+      const sortFilter = document.getElementById('sortFilter');
+
+      const searchTerm = globalSearch ? globalSearch.value.toLowerCase() : '';
+      const selectedGenre = genreFilter ? genreFilter.value : '';
+      const selectedStatus = statusFilter ? statusFilter.value : '';
+      const sortBy = sortFilter ? sortFilter.value || 'title' : 'title';
 
       let filtered = animeData.filter(anime => {
         const matchesSearch = anime.title.toLowerCase().includes(searchTerm);
-        const matchesGenre = !genreFilter || anime.genres.includes(genreFilter);
-        const matchesStatus = !statusFilter || anime.status === statusFilter;
+        const matchesGenre = !selectedGenre || anime.genres.includes(selectedGenre);
+        const matchesStatus = !selectedStatus || anime.status === selectedStatus;
         
         return matchesSearch && matchesGenre && matchesStatus;
       });
 
       // Sort
       filtered.sort((a, b) => {
-        switch (sortFilter) {
+        switch (sortBy) {
           case 'rating':
             return b.rating - a.rating;
           case 'year':
@@ -1989,7 +2094,8 @@
       
       // Update button states
       document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`${viewType}Btn`).classList.add('active');
+      const activeBtn = document.getElementById(`${viewType}Btn`);
+      if (activeBtn) activeBtn.classList.add('active');
       
       // Update grid classes
       const grids = document.querySelectorAll('.anime-grid');
@@ -2028,7 +2134,6 @@
     function editAnime(id) {
       const anime = animeData.find(a => a.id === id);
       if (anime) {
-        // Open edit modal
         alert(`Editando ${anime.title}...`);
         // Here you would implement the edit functionality
       }
@@ -2042,8 +2147,13 @@
     function loadData() {
       const savedData = localStorage.getItem('animeVaultData');
       if (savedData) {
-        animeData.splice(0, animeData.length, ...JSON.parse(savedData));
-        updateStats();
+        try {
+          const parsed = JSON.parse(savedData);
+          animeData.splice(0, animeData.length, ...parsed);
+          updateStats();
+        } catch (error) {
+          console.error('Error loading data:', error);
+        }
       }
     }
 
@@ -2096,59 +2206,125 @@
         link.addEventListener('click', function(e) {
           e.preventDefault();
           const page = this.getAttribute('data-page');
-          showPage(page);
+          if (page) {
+            showPage(page);
+          }
         });
       });
 
       // Sidebar toggle
-      document.getElementById('sidebarToggle').addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('collapsed');
-        const icon = this.querySelector('i');
-        icon.className = sidebar.classList.contains('collapsed') ? 
-          'fas fa-chevron-right' : 'fas fa-chevron-left';
-      });
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          const icon = this.querySelector('i');
+          if (icon) {
+            icon.className = sidebar.classList.contains('collapsed') ? 
+              'fas fa-chevron-right' : 'fas fa-chevron-left';
+          }
+        });
+      }
 
       // Mobile menu toggle
-      document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-      });
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function() {
+          if (sidebar.classList.contains('open')) {
+            closeMobileMenu();
+          } else {
+            openMobileMenu();
+          }
+        });
+      }
+
+      // Mobile overlay click
+      if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+      }
 
       // Theme toggle
-      document.getElementById('themeToggle').addEventListener('click', function() {
-        settings.darkMode = !settings.darkMode;
-        applySettings();
-        saveSettings();
-      });
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          settings.darkMode = !settings.darkMode;
+          applySettings();
+          saveSettings();
+        });
+      }
 
       // Focus mode toggle
-      document.getElementById('focusModeToggle').addEventListener('click', function() {
-        settings.focusMode = !settings.focusMode;
-        this.classList.toggle('active', settings.focusMode);
-        applySettings();
-        saveSettings();
-      });
+      const focusModeToggle = document.getElementById('focusModeToggle');
+      if (focusModeToggle) {
+        focusModeToggle.addEventListener('click', function() {
+          settings.focusMode = !settings.focusMode;
+          this.classList.toggle('active', settings.focusMode);
+          applySettings();
+          saveSettings();
+        });
+      }
+
+      // Settings modal toggle
+      const settingsToggle = document.getElementById('settingsToggle');
+      if (settingsToggle) {
+        settingsToggle.addEventListener('click', function() {
+          showPage('settings');
+        });
+      }
+
+      // Modal close
+      const modalClose = document.getElementById('modalClose');
+      if (modalClose) {
+        modalClose.addEventListener('click', closeModal);
+      }
+
+      if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+          if (e.target === modalOverlay) {
+            closeModal();
+          }
+        });
+      }
 
       // Search
-      document.getElementById('globalSearch').addEventListener('input', filterAnimes);
+      const globalSearch = document.getElementById('globalSearch');
+      if (globalSearch) {
+        globalSearch.addEventListener('input', filterAnimes);
+      }
 
       // Filters
-      document.getElementById('genreFilter')?.addEventListener('change', filterAnimes);
-      document.getElementById('statusFilter')?.addEventListener('change', filterAnimes);
-      document.getElementById('sortFilter')?.addEventListener('change', filterAnimes);
+      const genreFilter = document.getElementById('genreFilter');
+      const statusFilter = document.getElementById('statusFilter');
+      const sortFilter = document.getElementById('sortFilter');
+
+      if (genreFilter) genreFilter.addEventListener('change', filterAnimes);
+      if (statusFilter) statusFilter.addEventListener('change', filterAnimes);
+      if (sortFilter) sortFilter.addEventListener('change', filterAnimes);
 
       // View controls
-      document.getElementById('gridViewBtn')?.addEventListener('click', () => setView('grid-view'));
-      document.getElementById('listViewBtn')?.addEventListener('click', () => setView('list-view'));
-      document.getElementById('compactViewBtn')?.addEventListener('click', () => setView('compact-view'));
+      const gridViewBtn = document.getElementById('gridViewBtn');
+      const listViewBtn = document.getElementById('listViewBtn');
+      const compactViewBtn = document.getElementById('compactViewBtn');
+
+      if (gridViewBtn) gridViewBtn.addEventListener('click', () => setView('grid-view'));
+      if (listViewBtn) listViewBtn.addEventListener('click', () => setView('list-view'));
+      if (compactViewBtn) compactViewBtn.addEventListener('click', () => setView('compact-view'));
 
       // Settings toggles
       document.querySelectorAll('.toggle-switch').forEach(toggle => {
         toggle.addEventListener('click', function() {
           const settingKey = this.id.replace('Toggle', '').replace('Settings', '');
-          if (settings.hasOwnProperty(settingKey)) {
-            settings[settingKey] = !settings[settingKey];
+          
+          // Handle special cases for setting keys
+          let actualKey = settingKey;
+          if (settingKey === 'darkMode') actualKey = 'darkMode';
+          else if (settingKey === 'focusMode') actualKey = 'focusMode';
+          else if (settingKey === 'animations') actualKey = 'animations';
+          else if (settingKey === 'autoSave') actualKey = 'autoSave';
+          else if (settingKey === 'notifications') actualKey = 'notifications';
+          else if (settingKey === 'autoBackup') actualKey = 'autoBackup';
+
+          if (settings.hasOwnProperty(actualKey)) {
+            settings[actualKey] = !settings[actualKey];
             this.classList.toggle('active');
             applySettings();
             saveSettings();
@@ -2162,7 +2338,8 @@
           switch (e.key) {
             case 'k':
               e.preventDefault();
-              document.getElementById('globalSearch').focus();
+              const searchInput = document.getElementById('globalSearch');
+              if (searchInput) searchInput.focus();
               break;
             case 'd':
               e.preventDefault();
@@ -2178,6 +2355,15 @@
               applySettings();
               saveSettings();
               break;
+          }
+        }
+        
+        // ESC key to close modals/menus
+        if (e.key === 'Escape') {
+          if (modalOverlay.classList.contains('active')) {
+            closeModal();
+          } else if (sidebar.classList.contains('open')) {
+            closeMobileMenu();
           }
         }
       });
